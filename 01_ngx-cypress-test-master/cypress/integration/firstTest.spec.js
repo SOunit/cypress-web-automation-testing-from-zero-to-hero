@@ -205,7 +205,7 @@ describe('first', () => {
     cy.get('[type="checkbox"]').eq(0).check({ force: true });
   });
 
-  it.only('lists and dropdown', () => {
+  it('lists and dropdown', () => {
     cy.visit('/');
 
     // 1st
@@ -241,6 +241,54 @@ describe('first', () => {
         );
         if (index < 3) {
           cy.wrap(dropdown).click();
+        }
+      });
+    });
+  });
+
+  it.only('web tables', () => {
+    cy.visit('/');
+    cy.contains('Tables & Data').click();
+    cy.contains('Smart Table').click();
+
+    // 1st
+    cy.get('tbody')
+      .contains('tr', 'Larry')
+      .then((tableRow) => {
+        cy.wrap(tableRow).find('.nb-edit').click();
+        cy.wrap(tableRow).find('[placeholder="Age"]').clear().type('25');
+        cy.wrap(tableRow).find('.nb-checkmark').click();
+        cy.wrap(tableRow).find('td').eq(6).should('contain', '25');
+      });
+
+    // 2nd
+    cy.get('thead').find('.nb-plus').click();
+    cy.get('thead')
+      .find('tr')
+      .eq(2)
+      .then((tableRow) => {
+        cy.wrap(tableRow).find('[placeholder="First Name"]').type('Jack');
+        cy.wrap(tableRow).find('[placeholder="Last Name"]').type('Pearson');
+        cy.wrap(tableRow).find('.nb-checkmark').click();
+      });
+    cy.get('tbody tr')
+      .first()
+      .find('td')
+      .then((tableColumns) => {
+        cy.wrap(tableColumns).eq(2).should('contain', 'Jack');
+        cy.wrap(tableColumns).eq(3).should('contain', 'Pearson');
+      });
+
+    // 3rd
+    const ages = [20, 30, 40, 200];
+    cy.wrap(ages).each((age) => {
+      cy.get('thead [placeholder="Age"]').clear().type(age);
+      cy.wait(500);
+      cy.get('tbody tr').each((tableRow) => {
+        if (age === 200) {
+          cy.wrap(tableRow).should('contain', 'No data found');
+        } else {
+          cy.wrap(tableRow).find('td').eq(6).should('contain', age);
         }
       });
     });
