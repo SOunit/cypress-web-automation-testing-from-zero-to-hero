@@ -158,7 +158,33 @@ describe('first', () => {
       });
   });
 
-  it('assert property', () => {
+  it.only('assert property', () => {
+    function selectDayFromCurrent(day) {
+      let date = new Date();
+      date.setDate(date.getDate() + day);
+      let futureDate = date.getDate();
+      // let futureMonth = date.getMonth();
+      let futureMonth = date.toLocaleString('default', { month: 'short' });
+      let dateAssert =
+        futureMonth + ' ' + futureDate + ', ' + date.getFullYear();
+
+      cy.get('nb-calendar-navigation')
+        .invoke('attr', 'ng-reflect-date')
+        .then((dateAttribute) => {
+          if (!dateAttribute.includes(futureMonth)) {
+            // click next month
+            cy.get('[data-name="chevron-right"]').click();
+            selectDayFromCurrent(day);
+          } else {
+            cy.get('nb-calendar-day-picker [class="day-cell ng-star-inserted"]')
+              .contains(futureDate)
+              .click();
+          }
+        });
+
+      return dateAssert;
+    }
+
     cy.visit('/');
     cy.contains('Forms').click();
     cy.contains('Datepicker').click();
@@ -167,10 +193,8 @@ describe('first', () => {
       .find('input')
       .then((input) => {
         cy.wrap(input).click();
-        cy.get('nb-calendar-day-picker').contains('17').click();
-        cy.wrap(input)
-          .invoke('prop', 'value')
-          .should('contain', 'Apr 17, 2022');
+        const dateAssert = selectDayFromCurrent(30);
+        cy.wrap(input).invoke('prop', 'value').should('contain', dateAssert);
       });
   });
 
@@ -246,7 +270,7 @@ describe('first', () => {
     });
   });
 
-  it.only('web tables', () => {
+  it('web tables', () => {
     cy.visit('/');
     cy.contains('Tables & Data').click();
     cy.contains('Smart Table').click();
