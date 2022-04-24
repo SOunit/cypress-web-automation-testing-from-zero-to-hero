@@ -130,11 +130,16 @@ describe('first', () => {
     cy.contains('Form Layouts').click();
 
     // 1
-    cy.get('[for="exampleInputEmail1"]').should('contain', 'Email address');
+    cy.get('[for="exampleInputEmail1"]')
+      .should('contain', 'Email address')
+      .should('have.class', 'label')
+      .and('have.text', 'Email address');
 
     // 2
     cy.get('[for="exampleInputEmail1"]').then((label) => {
       expect(label.text()).to.equal('Email address');
+      expect(label).to.have.class('label');
+      expect(label).to.have.text('Email address');
     });
 
     // 3
@@ -158,7 +163,7 @@ describe('first', () => {
       });
   });
 
-  it('assert property', () => {
+  it.only('assert property', () => {
     function selectDayFromCurrent(day) {
       let date = new Date();
       date.setDate(date.getDate() + day);
@@ -195,6 +200,7 @@ describe('first', () => {
         cy.wrap(input).click();
         const dateAssert = selectDayFromCurrent(30);
         cy.wrap(input).invoke('prop', 'value').should('contain', dateAssert);
+        cy.wrap(input).should('have.value', dateAssert);
       });
   });
 
@@ -327,7 +333,7 @@ describe('first', () => {
     cy.get('nb-tooltip').should('contain', 'This is a tooltip');
   });
 
-  it.only('dialog box', () => {
+  it('dialog box', () => {
     cy.visit('/');
     cy.contains('Tables & Data').click();
     cy.contains('Smart Table').click();
