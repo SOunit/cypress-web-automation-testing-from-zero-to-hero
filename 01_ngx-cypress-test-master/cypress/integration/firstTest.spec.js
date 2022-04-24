@@ -158,7 +158,7 @@ describe('first', () => {
       });
   });
 
-  it.only('assert property', () => {
+  it('assert property', () => {
     function selectDayFromCurrent(day) {
       let date = new Date();
       date.setDate(date.getDate() + day);
@@ -315,6 +315,48 @@ describe('first', () => {
           cy.wrap(tableRow).find('td').eq(6).should('contain', age);
         }
       });
+    });
+  });
+
+  it('tooltip', () => {
+    cy.visit('/');
+    cy.contains('Modal & Overlays').click();
+    cy.contains('Tooltip').click();
+
+    cy.contains('nb-card', 'Colored Tooltips').contains('Default').click();
+    cy.get('nb-tooltip').should('contain', 'This is a tooltip');
+  });
+
+  it.only('dialog box', () => {
+    cy.visit('/');
+    cy.contains('Tables & Data').click();
+    cy.contains('Smart Table').click();
+
+    // 1. not good approach
+    // cy.get('tbody tr').first().find('.nb-trash').click();
+    // // because never run test if on parameter do not match
+    // cy.on('window:confirm', (confirm) => {
+    //   expect(confirm).to.equal('Are you sure you want to delete?');
+    // });
+
+    // 2. better approach, this assertion can create error if fail
+    // const stub = cy.stub();
+    // cy.on('window:confirm', stub);
+    // cy.get('tbody tr')
+    //   .first()
+    //   .find('.nb-trash')
+    //   .click()
+    //   .then(() => {
+    //     expect(stub.getCall(0)).to.be.calledWith(
+    //       'Are you sure you want to delete?'
+    //     );
+    //   });
+
+    // 3. prevent delete
+    cy.get('tbody tr').first().find('.nb-trash').click();
+    // because never run test if on parameter do not match
+    cy.on('window:confirm', (confirm) => {
+      return false;
     });
   });
 });
