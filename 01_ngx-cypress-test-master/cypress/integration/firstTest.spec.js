@@ -39,9 +39,88 @@ describe('first', () => {
     cy.get('[data-cy="imputEmail1"]');
   });
 
-  it.only('second test', () => {
+  it('second test', () => {
     cy.visit('/');
     cy.contains('Forms').click();
     cy.contains('Form Layout').click();
+
+    cy.get('[data-cy="signInButton"]');
+
+    cy.contains('Sign in');
+
+    cy.contains('[status="warning"]', 'Sign in');
+
+    cy.get('#inputEmail3')
+      .parents('form')
+      .find('button')
+      .should('contain', 'Sign in')
+      .parents('form')
+      .find('nb-checkbox')
+      .click();
+
+    cy.contains('nb-card', 'Horizontal form').find('[type="email"]');
+  });
+
+  it.only('then and wrap methods', () => {
+    cy.visit('/');
+    cy.contains('Forms').click();
+    cy.contains('Form Layouts').click();
+
+    // want to avoid redundancy
+    // 1st form
+    // cy.contains('nb-card', 'Using the Grid')
+    //   .find('[for=inputEmail1]')
+    //   .should('contain', 'Email');
+
+    // cy.contains('nb-card', 'Using the Grid')
+    //   .find('[for="inputPassword2"]')
+    //   .should('contain', 'Password');
+
+    // 2nd form
+    // cy.contains('nb-card', 'Basic form')
+    //   .find('[for=exampleInputEmail1]')
+    //   .should('contain', 'Email');
+
+    // cy.contains('nb-card', 'Basic form')
+    //   .find('[for="exampleInputPassword1"]')
+    //   .should('contain', 'Password');
+
+    // selenium (not work in cypress)
+    // const firstForm = cy.contains('nb-card', 'Using the Grid');
+    // firstForm.find('[for=inputEmail1]').should('contain', 'Email');
+    // firstForm.find('[for="inputPassword2"]').should('contain', 'Password');
+
+    // const secondForm = cy.contains('nb-card', 'Basic form');
+    // secondForm.find('[for=exampleInputEmail1]').should('contain', 'Email');
+    // secondForm
+    //   .find('[for="exampleInputPassword1"]')
+    //   .should('contain', 'Password');
+
+    // cypress style
+    cy.contains('nb-card', 'Using the Grid').then((firstForm) => {
+      // firstForm come from jQuery
+
+      // jQuery style
+      const emailLabelFirst = firstForm.find('[for=inputEmail1]').text();
+      const passwordLabelFirst = firstForm
+        .find('[for="inputPassword2"]')
+        .text();
+
+      // jQuery style assertion
+      expect(emailLabelFirst).to.equal('Email');
+      expect(passwordLabelFirst).to.equal('Password');
+
+      cy.contains('nb-card', 'Basic form').then((secondForm) => {
+        const passwordLabelSecond = secondForm
+          .find('[for="exampleInputPassword1"]')
+          .text();
+        expect(passwordLabelFirst).to.equal(passwordLabelSecond);
+
+        // cypress style
+        cy.wrap(secondForm)
+          .find('[for="exampleInputPassword1"]')
+          .should('contain', 'Password');
+      });
+    });
   });
 });
