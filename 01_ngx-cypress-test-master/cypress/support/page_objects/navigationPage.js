@@ -27,7 +27,7 @@ export class NavigationPage {
     cy.contains('Toastr').click();
   }
 
-  sampleTablePage() {
+  smartTablePage() {
     selectGroupMenuItem('Tables & Data');
     cy.contains('Smart Table').click();
   }
