@@ -15,7 +15,7 @@ describe('Test with backend', () => {
     cy.loginToApplication();
   });
 
-  it('verify correct request and response', () => {
+  it.skip('verify correct request and response', () => {
     // cy.server();
     // cy.route('POST', '**/articles').as('postArticles');
     cy.intercept('POST', '**/api.realworld.io/api/articles').as('postArticles');
@@ -39,14 +39,14 @@ describe('Test with backend', () => {
     });
   });
 
-  it('should gave tags with routing objects', () => {
+  it.skip('should gave tags with routing objects', () => {
     cy.get('.tag-list')
       .should('contain', 'cypress')
       .and('contain', 'automation')
       .and('contain', 'testing');
   });
 
-  it('verify global feed likes count', () => {
+  it.skip('verify global feed likes count', () => {
     // cy.route('GET', '**/articles/feed*', '{"articles":[],"articlesCount":0}');
     // cy.route('GET', '**/articles*', 'fixture:articles.json');
     cy.intercept('GET', '**/articles/feed*', {
@@ -72,8 +72,17 @@ describe('Test with backend', () => {
   });
 
   it('intercepting and modifying the request and response', () => {
+    // 1. modify request
+    // cy.intercept('POST', '**/api.realworld.io/api/articles', (req) => {
+    //   req.body.article.description = 'This is a description 2';
+    // }).as('postArticles');
+
+    // 2. modify response
     cy.intercept('POST', '**/api.realworld.io/api/articles', (req) => {
-      req.body.article.description = 'This is a description 2';
+      req.reply((res) => {
+        expect(res.body.article.description).to.equal('This is a description');
+        res.body.article.description = 'This is a description 2';
+      });
     }).as('postArticles');
 
     cy.contains('New Article').click();
