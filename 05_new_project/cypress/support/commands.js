@@ -24,9 +24,34 @@
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 
-Cypress.Commands.add("loginToApplication", () => {
-  cy.visit("/login");
-  cy.get('[placeholder="Email"]').type("workbookwork7@gmail.com");
-  cy.get('[placeholder="Password"]').type("password");
-  cy.get("form").submit();
+Cypress.Commands.add('loginToApplication', () => {
+  // 1st. just login via login page
+  // cy.visit('/login');
+  // cy.get('[placeholder="Email"]').type('workbookwork7@gmail.com');
+  // cy.get('[placeholder="Password"]').type('password');
+  // cy.get('form').submit();
+
+  // 2nd. fetch token and save to local storage for faster test
+  const userCredentials = {
+    user: {
+      email: 'workbookwork7@gmail.com',
+      password: 'password',
+    },
+  };
+
+  cy.request(
+    'POST',
+    'https://api.realworld.io/api/users/login',
+    userCredentials
+  )
+    .its('body')
+    .then((body) => {
+      const token = body.user.token;
+
+      cy.visit('/', {
+        onBeforeLoad: (window) => {
+          window.localStorage.setItem('jwtToken', token);
+        },
+      });
+    });
 });
