@@ -48,6 +48,9 @@ Cypress.Commands.add('loginToApplication', () => {
     .then((body) => {
       const token = body.user.token;
 
+      // save token to omit login from test case
+      cy.wrap(token).as('token');
+
       cy.visit('/', {
         onBeforeLoad: (window) => {
           window.localStorage.setItem('jwtToken', token);
